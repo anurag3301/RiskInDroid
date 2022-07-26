@@ -49,11 +49,11 @@ def run():
         if(not os.path.exists("results")):
             os.mkdir("results")
 
-        result_path = "results/" + datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+        result_path = os.path.join("results", datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S"))
         os.mkdir(result_path)
         
         for file in file_list:
-            file_path = apk_dir_path + "/" +file
+            file_path = os.path.join(apk_dir_path ,file)
             if not check_if_valid_file_name(file_path):
                 print(file, ": Not and apk, skipping...")
                 continue
@@ -63,7 +63,7 @@ def run():
             permission_dict = {**{"apk": file}, **permission_dict}
             permission_json = json.dumps(permission_dict, indent=4)
             result_file = file.replace(" ", "_").removesuffix(".apk").removesuffix(".zip")+".json"
-            with open(result_path+"/"+result_file, "w") as f:
+            with open(os.path.join(result_path, result_file), "w") as f:
                 f.write(permission_json)
             print("Result Written for: " + file)
 
