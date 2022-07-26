@@ -105,19 +105,18 @@ def run():
         file_list = [f for f in os.listdir(apk_dir_path)
                      if os.path.isfile(os.path.join(apk_dir_path, f))]
 
-        for file in file_list:
-            file_path = os.path.join(apk_dir_path ,file)
+        for file_name in file_list:
+            file_path = os.path.join(apk_dir_path ,file_name)
             if not check_if_valid_file_name(file_path):
-                print(file, ": Not and apk, skipping...")
+                print(file_name, ": Not and apk, skipping...")
                 continue
 
-            print("\nAnazying " + file)
+            print("\nAnazying " + file_name)
             permission_dict = get_risk(file_path)
-            permission_dict = {**{"apk": file}, **permission_dict}
-            permission_json = json.dumps(permission_dict, indent=4)
-            result_file = file.replace(" ", "_").removesuffix(".apk").removesuffix(".zip")+".json"
-            with open(os.path.join(result_path, result_file), "w") as f:
-                f.write(permission_json)
-            print("Result Written for: " + file)
+            permission_dict = {**{"apk": file_name}, **permission_dict}
+            if args.cli:
+                print_result(permission_dict)
+            if args.out:
+                result_store(permission_dict, file_name)
 
 run()
