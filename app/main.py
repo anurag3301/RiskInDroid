@@ -9,8 +9,9 @@ from RiskInDroid import RiskInDroid
 from model import db, Apk
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-f", "--file", help="apk file name")
-parser.add_argument("-d", "--dir", help="apk directory path")
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("-f", "--file", help="apk file name")
+group.add_argument("-d", "--dir", help="apk directory path")
 args = parser.parse_args()
 ALLOWED_EXTENSIONS = {"apk", "zip"}
 
