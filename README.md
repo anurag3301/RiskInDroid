@@ -1,5 +1,5 @@
-# RiskInDroid
-
+# RiskInDroid CLI
+### This Cli implimentation of original [RisdInDroid](https://github.com/ClaudiuGeorgiu/RiskInDroid)
 > A tool for quantitative risk analysis of Android applications based on machine
 > learning techniques.
 
@@ -74,128 +74,31 @@ You can cite the paper as follows:
 
 ## ❱ Demo
 
-You can browse the full experimental results through a web interface and calculate the
-risk of new applications (by uploading the `.apk` file). Below you can see a brief
-demo of RiskInDroid:
-
-![Web](https://raw.githubusercontent.com/ClaudiuGeorgiu/RiskInDroid/master/docs/demo/web.gif)
-
 
 
 ## ❱ Installation & Usage
 
-There are two ways of getting a working copy of RiskInDroid on your own computer:
-either by [using Docker](#docker-image) or by
-[using directly the source code](#from-source) in a `Python 3` environment. In both
-cases, the first thing to do is to get a local copy of this repository, so open up a
-terminal in the directory where you want to save the project and clone the repository:
-
 ```Shell
-$ git clone https://github.com/ClaudiuGeorgiu/RiskInDroid.git
+$ # Clone the repo
+$ git clone https://github.com/anurag3301/RiskInDroid.git
+$
+$ # cd into the RiskInDroid folder
+$ cd RiskInDroid
+$ 
+$ # See The usage
+$ python3 app/main.py --help
+$ 
+$ # Do a test run, print the result on terminal
+$ python3 app/main.py --cli --file ./app/test/test_resources/InsecureBankv2.apk
+$ 
+$ # Do a test run, print the result on terminal and store the result in json file
+$ python3 app/main.py --cli --out ./ --file ./app/test/test_resources/InsecureBankv2.apk
+$ # This will create a new directory name results, the results will be stored there
+$
+$ # Do a test on directory containing lot of apks 
+$ # print the result on terminal and store the result in json file
+$ python3 app/main.py --cli --out ./ --dir ./app/test/test_resources
 ```
-
-### Docker image
-
-----------------------------------------------------------------------------------------
-
-#### Prerequisites
-
-This is the suggested way of installing RiskInDroid, since the only requirement
-is to have a recent version of Docker installed:
-
-```Shell
-$ docker --version             
-Docker version 20.10.7, build f0df350
-```
-
-#### Official Docker Hub image
-
-The [official RiskInDroid Docker image](https://hub.docker.com/r/claudiugeorgiu/riskindroid)
-is available on Docker Hub (automatically built from this repository):
-
-```Shell
-$ # Download the Docker image.
-$ docker pull claudiugeorgiu/riskindroid
-$ # Give it a shorter name.
-$ docker tag claudiugeorgiu/riskindroid riskindroid
-```
-
-#### Install
-
-If you downloaded the official image from Docker Hub, you are ready to use the tool,
-otherwise execute the following command in the previously created `RiskInDroid/`
-directory (the folder containing the `Dockerfile`) in order to build the Docker image:
-
-```Shell
-$ # Make sure to run the command in RiskInDroid/ directory.
-$ # It will take some time to download and install all the dependencies.
-$ docker build -t riskindroid .
-```
-
-#### Start RiskInDroid
-
-RiskInDroid is now ready to be used, run the following command to start the web
-interface of the tool:
-
-```Shell
-$ docker run --rm -p 8080:80 riskindroid
-
-$ # Navigate to http://localhost:8080/ to use RiskInDroid.
-```
-
-If you need to keep a persistent copy of the uploaded applications, mount
-`/var/www/app/upload/` directory from the container to the host (e.g., add
-`-v "${PWD}":"/var/www/app/upload/"` parameter to the above command to save
-the uploaded applications in the current directory).
-
-### From source
-
-----------------------------------------------------------------------------------------
-
-#### Prerequisites
-
-To use RiskInDroid you need `Python 3` (at least `3.7`), `Java` (at least version `8`)
-and a tool to extract the content of `RiskInDroid/app/database/permission_db.7z`
-archive (e.g., `p7zip-full` can be used for this task in Ubuntu). Note: although
-possible, the installation of some of the Python libraries is not straightforward
-on Windows, the usage of a Linux distribution such as Ubuntu is advised.
-
-#### Install
-
-Run the following commands in the main directory of the project (`RiskInDroid/`)
-to install the needed dependencies:
-
-```Shell
-$ # Make sure to run the commands in RiskInDroid/ directory.
-
-$ # Extract permission_db.db from app/database/permission_db.7z archive and put 
-$ # it into app/database/ directory.
-
-$ # The usage of a virtual environment is highly recommended, e.g., virtualenv.
-$ # If not using virtualenv (https://virtualenv.pypa.io/), skip the next 2 lines.
-$ virtualenv -p python3 venv
-$ source venv/bin/activate
-
-$ # Install RiskInDroid's requirements.
-$ python3 -m pip install -r requirements.txt
-```
-
-#### Start RiskInDroid
-
-RiskInDroid is now ready to be used, run the following command to start the web
-interface of the tool:
-
-```Shell
-$ # Make sure to run the command in RiskInDroid/ directory.
-$ python3 app/app.py
-
-$ # Navigate to http://localhost:5000/ to use RiskInDroid.
-```
-
-`NOTE:` the repository already contains the pre-trained models for the used
-classifiers, if you want to train the models again (e.g., to use a newer version of
-*scikit-learn*) just delete the contents of `app/models/` directory. The models will
-be recreated from the source data the next time an application is analyzed.
 
 
 
