@@ -17,15 +17,24 @@ group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-f", "--file", help="apk file name")
 group.add_argument("-d", "--dir", help="apk directory path")
 parser.add_argument("-c", "--cli", help="Show Result in Terminal", action='store_true')
+parser.add_argument("-o", "--out", help="Path to result storeage path")
 args = parser.parse_args()
-
-print(args)
-
 
 ALLOWED_EXTENSIONS = {"apk", "zip"}
 
 pp = pprint.PrettyPrinter(indent=2)
 rid = RiskInDroid()
+
+if args.out:
+    out_path = args.out
+    if not os.path.exists(out_path):
+        print("Not a valid path: " + out_path)
+        exit()
+    if(not os.path.exists("results")):
+        os.mkdir("results")
+
+    result_path = os.path.join("results", datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S"))
+    os.mkdir(result_path)
 
 def print_result(permissions_dict):
     print("\n\nAPK Name: " + permissions_dict['apk'])
@@ -46,6 +55,14 @@ def print_result(permissions_dict):
         print('\t' + i)
 
     print("\nTotal Risk Score: " + str(permissions_dict['risk_factor']))
+
+def result_store(permission_dict, file_name):
+    out_path = args.out
+    permission_json = json.dumps(permission_dict, indent=4)
+    result_file = file_name.replace(" ", "_").removesuffix(".apk").removesuffix(".zip")+".json"
+    with open(os.path.join(out_path, result_path, result_file), "w") as f:
+        f.write(permission_json)
+    print("Result Written for: " + file_name)
 
 def check_if_valid_file_name(file_name):
     return (
@@ -70,24 +87,15 @@ def run():
             return
 
         print(apk_file_path)
-        file = os.path.basename(apk_file_path)
-        # if(not os.path.exists("results")):
-        #     os.mkdir("results")
+        file_name = os.path.basename(apk_file_path)
 
-        # result_path = os.path.join("results", datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S"))
-        # os.mkdir(result_path)
-
-        print("\nAnazying " + file)
+        print("\nAnazying " + file_name)
         permission_dict = get_risk(apk_file_path)
-        permission_dict = {**{"apk": file}, **permission_dict}
+        permission_dict = {**{"apk": file_name}, **permission_dict}
         if args.cli:
             print_result(permission_dict)
-        
-        # permission_json = json.dumps(permission_dict, indent=4)
-        # result_file = file.replace(" ", "_").removesuffix(".apk").removesuffix(".zip")+".json"
-        # with open(os.path.join(result_path, result_file), "w") as f:
-        #     f.write(permission_json)
-        # print("Result Written for: " + file)
+        if args.out:
+            result_store(permission_dict, file_name)
 
     elif args.dir:
         apk_dir_path = args.dir
@@ -97,12 +105,6 @@ def run():
         file_list = [f for f in os.listdir(apk_dir_path)
                      if os.path.isfile(os.path.join(apk_dir_path, f))]
 
-        if(not os.path.exists("results")):
-            os.mkdir("results")
-
-        result_path = os.path.join("results", datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S"))
-        os.mkdir(result_path)
-        
         for file in file_list:
             file_path = os.path.join(apk_dir_path ,file)
             if not check_if_valid_file_name(file_path):
