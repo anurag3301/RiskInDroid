@@ -36,7 +36,30 @@ def get_risk(file_path):
 def run():
     if args.file:
         apk_file_path = args.file
+        if not os.path.isfile(apk_file_path):
+            print("File not found", apk_file_path)
+            return
+        
+        if not check_if_valid_file_name(apk_file_path):
+            print(apk_file_path, ": Not and apk")
+            return
+
         print(apk_file_path)
+        file = os.path.basename(apk_file_path)
+        if(not os.path.exists("results")):
+            os.mkdir("results")
+
+        result_path = os.path.join("results", datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S"))
+        os.mkdir(result_path)
+
+        print("\nAnazying " + file)
+        permission_dict = get_risk(apk_file_path)
+        permission_dict = {**{"apk": file}, **permission_dict}
+        permission_json = json.dumps(permission_dict, indent=4)
+        result_file = file.replace(" ", "_").removesuffix(".apk").removesuffix(".zip")+".json"
+        with open(os.path.join(result_path, result_file), "w") as f:
+            f.write(permission_json)
+        print("Result Written for: " + file)
 
     elif args.dir:
         apk_dir_path = args.dir
