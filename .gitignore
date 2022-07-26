@@ -138,3 +138,5 @@ upload/
 
 # SQLite database (the compressed version is already included)
 *.db
+
+results/
