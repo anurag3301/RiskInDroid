@@ -4,6 +4,10 @@ import subprocess
 import time
 import pprint
 import argparse
+import os
+import sys
+import datetime
+import json
 
 from RiskInDroid import RiskInDroid
 from model import db, Apk
@@ -16,6 +20,7 @@ args = parser.parse_args()
 ALLOWED_EXTENSIONS = {"apk", "zip"}
 
 pp = pprint.PrettyPrinter(indent=2)
+rid = RiskInDroid()
 
 def check_if_valid_file_name(file_name):
     return (
@@ -23,9 +28,43 @@ def check_if_valid_file_name(file_name):
     )
 
 def get_risk(file_path):
-    file_path = "/home/anurag/dl/apktool/compass.apk"
-    rid = RiskInDroid()
     permissions = rid.get_permission_json(file_path)
     risk = rid.calculate_risk(rid.get_feature_vector_from_json(permissions))
     permissions["risk_factor"] = risk
-    pp.pprint(permissions)
+    return permissions
+
+def run():
+    if args.file:
+        apk_file_path = args.file
+        print(apk_file_path)
+
+    elif args.dir:
+        apk_dir_path = args.dir
+        if(not os.path.exists(apk_dir_path)):
+            print("The Directory path does not exists..", file=sys.stderr)
+            return
+        file_list = [f for f in os.listdir(apk_dir_path)
+                     if os.path.isfile(os.path.join(apk_dir_path, f))]
+
+        if(not os.path.exists("results")):
+            os.mkdir("results")
+
+        result_path = "results/" + datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S")
+        os.mkdir(result_path)
+        
+        for file in file_list:
+            file_path = apk_dir_path + "/" +file
+            if not check_if_valid_file_name(file_path):
+                print(file, ": Not and apk, skipping...")
+                continue
+
+            print("\nAnazying " + file)
+            permission_dict = get_risk(file_path)
+            permission_dict = {**{"apk": file}, **permission_dict}
+            permission_json = json.dumps(permission_dict, indent=4)
+            result_file = file.replace(" ", "_").removesuffix(".apk").removesuffix(".zip")+".json"
+            with open(result_path+"/"+result_file, "w") as f:
+                f.write(permission_json)
+            print("Result Written for: " + file)
+
+run()
