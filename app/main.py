@@ -1,17 +1,15 @@
-import hashlib
+from RiskInDroid import RiskInDroid
 import os
-import subprocess
-import time
 import pprint
 import argparse
 import os
 import sys
 import datetime
 import json
-
-from RiskInDroid import RiskInDroid
-from model import db, Apk
 import argparse
+
+ALLOWED_EXTENSIONS = {"apk", "zip"}
+
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument("-f", "--file", help="apk file name")
@@ -19,8 +17,6 @@ group.add_argument("-d", "--dir", help="apk directory path")
 parser.add_argument("-c", "--cli", help="Show Result in Terminal", action='store_true')
 parser.add_argument("-o", "--out", help="Path to result storeage path")
 args = parser.parse_args()
-
-ALLOWED_EXTENSIONS = {"apk", "zip"}
 
 pp = pprint.PrettyPrinter(indent=2)
 rid = RiskInDroid()
@@ -35,6 +31,7 @@ if args.out:
 
     result_path = os.path.join("results", datetime.datetime.now().strftime("%d-%m-%Y_%H-%M-%S"))
     os.mkdir(result_path)
+
 
 def print_result(permissions_dict):
     print("\n\nAPK Name: " + permissions_dict['apk'])
@@ -56,6 +53,7 @@ def print_result(permissions_dict):
 
     print("\nTotal Risk Score: " + str(permissions_dict['risk_factor']))
 
+
 def result_store(permission_dict, file_name):
     out_path = args.out
     permission_json = json.dumps(permission_dict, indent=4)
@@ -64,16 +62,19 @@ def result_store(permission_dict, file_name):
         f.write(permission_json)
     print("Result Written for: " + file_name)
 
+
 def check_if_valid_file_name(file_name):
     return (
         "." in file_name and file_name.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
     )
+
 
 def get_risk(file_path):
     permissions = rid.get_permission_json(file_path)
     risk = rid.calculate_risk(rid.get_feature_vector_from_json(permissions))
     permissions["risk_factor"] = risk
     return permissions
+
 
 def run():
     if args.file:
